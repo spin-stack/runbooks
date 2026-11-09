@@ -1,0 +1,20 @@
+version: '3'
+
+# Operational runbooks for an installation of Spinbox. runbooks/*.md are the source; spin pins this
+# repository and serves them to an installation's administrators, so `task check` holds each to
+# the shape the app reads.
+
+tasks:
+  default:
+    cmds:
+      - task: check
+
+  check:
+    desc: What CI runs - fail if a runbook's front matter, sections or links are not what the app reads, it carries raw HTML or what a public repository must not, a workflow step is not one task, or an install skips Socket Firewall.
+    cmds:
+      # The Task running this one: go.mod's is not on PATH, and taskgate asks it for the task names.
+      - go tool taskgate -task {{.TASK_EXE}}
+      - go tool sfw check
+      - go vet ./...
+      - go test ./...
+      - go run ./cmd/check

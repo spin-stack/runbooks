@@ -1,0 +1,34 @@
+name: Gate
+
+# Holds every runbook to the shape spin's app reads, on every push and pull request.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+# go-tools' downloads (sfw, versions) ask GitHub with this: anonymous ones are the first it sheds
+# under load, and they answered 504 for minutes on 2026-11-09.
+env:
+  GITHUB_TOKEN: ${{ github.token }}
+
+jobs:
+  check:
+    # The check main's ruleset requires, named Gate in every spin-stack repository.
+    name: Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      # What a developer runs, with the Task go.mod pins.
+      - run: go tool task check
