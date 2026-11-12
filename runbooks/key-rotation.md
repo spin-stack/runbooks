@@ -93,22 +93,53 @@ spin team secret set <team> <name> --host <host>
 ```
 
 **The installation's encryption key** (seals secrets in the database, and the database's password
-and archive keys are derived from it): check it on the control plane's machine:
+and archive keys are derived from it). It has versions: the newest seals, every version still
+named opens what was sealed under it. A suspected leak of this key is a security incident:
+escalate, and rotate it as below. Check it first, on the control plane's machine:
 
 ```
 sudo spin-controlplane crypto status
 sudo spin-controlplane crypto verify
 ```
 
-TODO: no procedure or command adds a new version of the installation's key to where an
-installation keeps it, before `controlplane crypto rotate` ([spin#1049](https://github.com/spin-stack/spin/issues/1049)). A suspected leak of
-this key is a security incident: escalate.
+1. **Add the next version where the installation names its key.** On AWS, append it to the
+   Terraform module's `encryption_key_versions` (`[1]` becomes `[1, 2]`) and apply. Each version is
+   a key of its own agreed with the same KMS key; nothing new is made in KMS. The document changes,
+   so the apply replaces the control plane's machine with one that seals under the new version.
+   Elsewhere, make a key with `sudo spin-controlplane crypto generate-key` and give the control
+   plane `SPIN_CP_ENCRYPTION_KEY="v1:<old key>,v2:<new key>"` where it reads its key, then restart
+   it.
+2. **Re-seal**, on the control plane's machine that now serves:
+
+   ```
+   sudo spin-controlplane crypto rotate --dry-run
+   sudo spin-controlplane crypto rotate
+   ```
+
+   It refuses while the serving control plane does not seal under the newest version. That
+   happens when the replacement has not finished starting, or when you ran it on the old machine.
+   Wait for the new machine to serve and run it there. It also refuses a database holding values
+   under a version newer than its machine names. Every run ends with *Left under older versions*:
+   what is still sealed under each older version, by kind. A run with `FAILED` lines exits
+   non-zero: keep the old version and escalate.
+3. **Retire the old version** only when both are true:
+   - a run reports `v1: none` and no failures;
+   - the database's archive keeps no base backup taken before the rotation. Seven are kept, one a
+     day, so wait seven days.
+
+   A restore takes only the newest base backup. If the old version must go sooner, first take one
+   with `sudo systemctl start spin-postgres-backup.service`. Older base backups then cannot be
+   opened ([database-restore](database-restore.md)). Then remove the version (`[2]`) and apply,
+   or drop it from `SPIN_CP_ENCRYPTION_KEY` and restart. A version removed while anything is still
+   sealed under it is that data lost.
 
 ## Verify
 
 [Admin → Audit](/admin/audit) shows each revoke. `spin admin volume rekeys` empties as the job
 finishes; the job's last run on Admin → Jobs succeeded. `spin admin token list` and
-`spin api-key list` no longer show what was revoked.
+`spin api-key list` no longer show what was revoked. After an encryption key rotation,
+`sudo spin-controlplane crypto status` marks the new version `<- current` and says every record
+is under it, and `sudo spin-controlplane crypto verify` passes after the old version is retired.
 
 ## Escalate
 
