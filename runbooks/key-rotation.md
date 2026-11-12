@@ -8,7 +8,7 @@ applies_to:
   dashboards: []
 severity: info
 owner: security
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -54,12 +54,11 @@ workspace is stopped or quarantined. Watch it with `spin admin volume rekeys`. B
 stopped or quarantined workspace:
 
 ```
-spin admin volume rekey <workspace>
+spin admin volume rekey <workspace-id>
 ```
 
-TODO: the CLI looks the workspace up as the caller's own before it calls the admin API, so it
-reaches only an administrator's own workspaces; there is no command for another person's
-([spin#1046](https://github.com/spin-stack/spin/issues/1046)).
+It takes the workspace's id, not its name, and works for anybody's workspace. The id is in
+`spin admin volume rekeys --json` (`workspace_id`) for a marked disk, or on the workspace's page.
 
 **Runner registration tokens**: `spin admin token revoke <token-id>`. A pool's token is
 re-minted on the control plane's machine with `sudo spin-controlplane registration-token ...`.
