@@ -8,7 +8,7 @@ applies_to:
   dashboards: [storage]
 severity: critical
 owner: security
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -76,12 +76,23 @@ Treat the host as taken until proven otherwise.
    Re-key a disk that is not marked (its workspace stopped or quarantined first):
 
    ```
-   spin admin volume rekey <workspace>
+   spin admin volume rekey <workspace-id>
    ```
 
    A re-key deletes the old disk and every snapshot of it. More in [key-rotation](key-rotation.md).
+- **The host is a runner of an autoscaling group**: remove it as taken. Its credentials are
+  revoked and it is cut off first, every team disk whose key it was given is marked for
+  re-keying, and then its machine is given back to its group:
 
-TODO: removing an autoscaling group's runner believed taken does not mark the disks it held for re-keying, and nothing lists them ([spin#1047](https://github.com/spin-stack/spin/issues/1047))
+  ```
+  spin admin runner remove --taken <runner-id>
+  ```
+
+  It prints `Runner revoked; <n> disks marked for re-keying (spin admin volume rekeys)`. It is
+  refused while a workspace's only disk is on the runner; add `--leave-workspaces` to remove it
+  anyway, and each such workspace runs again only once recovered onto another runner. In the
+  dashboard: the runner's menu, *Remove as compromised*. The marked disks are listed by
+  `spin admin volume rekeys`.
 
 ## Verify
 

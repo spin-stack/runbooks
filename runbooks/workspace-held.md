@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet, storage]
 severity: critical
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -63,17 +63,25 @@ is ever moved on its own, and the owner must recover by hand.
 
 - **The host can be brought back** (a reboot, a network fault): bring it back. The workspace runs
   on it again with nothing lost. Nobody needs to recover anything.
-- **The host is gone for good**: tell the owner. Only the owner can give up their work: the
-  command is theirs (`spin workspace recover <workspace> --accept-data-loss`). It takes the disk
-  from the dead host and places it on a live one; then they start it. Afterwards retire the
-  host ([lost-runner](lost-runner.md)).
+- **The host is gone for good**: tell the owner. The owner recovers it with
+  `spin workspace recover <workspace> --accept-data-loss`. It takes the disk from the dead host
+  and places it on a live one; then they start it. Afterwards retire the host
+  ([lost-runner](lost-runner.md)).
+- **The owner cannot recover it, and you recover it for them**: run it first without
+  `--accept-data-loss` to see the work that is given up; nothing changes until you pass it.
+  `--reason` is required:
+
+  ```
+  spin admin workspace recover <workspace-id> --reason "<why>"
+  spin admin workspace recover <workspace-id> --reason "<why>" --accept-data-loss
+  ```
+
+  It is audited, and written to the workspace's history with your reason, which its owner sees
+  on Activity.
 - **The installation should move such workspaces on its own** next time: set
   `rehome_after_seconds` and `rehome_max_unpublished_bytes` in the installation's configuration
   file, and apply the change on [Admin → Settings](/admin/settings). Giving up unpublished work
   without asking is a policy decision; make it on purpose.
-
-TODO: an administrator cannot recover a workspace for its owner; `RecoverWorkspace` answers
-only the owner ([spin#1045](https://github.com/spin-stack/spin/issues/1045)).
 
 ## Verify
 

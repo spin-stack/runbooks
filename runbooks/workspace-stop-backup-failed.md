@@ -8,7 +8,7 @@ applies_to:
   dashboards: [storage, fleet]
 severity: warning
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -62,8 +62,13 @@ lost.
   spin workspace stop <workspace> --force
   ```
 
-TODO: an administrator cannot stop another person's workspace; `StopWorkspace` answers only the
-owner ([spin#1045](https://github.com/spin-stack/spin/issues/1045)).
+- **The owner cannot stop it, and you stop it for them**: the same stop, audited with your reason;
+  the workspace's history names you. Add `--force` only to give up what only its runner has:
+
+  ```
+  spin admin workspace stop <workspace-id> --reason "<why>"
+  spin admin workspace stop <workspace-id> --reason "<why>" --force
+  ```
 
 ## Verify
 

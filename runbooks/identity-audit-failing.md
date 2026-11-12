@@ -8,7 +8,7 @@ applies_to:
   dashboards: []
 severity: critical
 owner: security
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -68,11 +68,15 @@ and every grant is recorded in the bucket where it cannot be taken back.
   spin admin jobs run identity-audit
   ```
 
-  Each run checks only its own hour; hours missed while it failed are not checked again by the job.
-  Check them by hand: the `Decrypt` calls in the key service's log against the records under
-  `identity/granted/` for the same hours.
+  Each run audits every settled hour since the last one it audited, oldest first, at most 24 a
+  run. An hour it cannot read stops the run and is the next run's first. On
+  [Admin → Jobs](/admin/jobs?job=identity-audit), `hours` is the hours audited this run, `behind`
+  the settled hours still owed, and `unaudited` the hours the key service's log no longer keeps.
 
-  TODO: the audit does not go back over hours it missed while failing ([spin#1051](https://github.com/spin-stack/spin/issues/1051))
+  If the run fails with `audit: the key service no longer keeps its log of hours that were never
+  audited`, those hours (the error names how many and between when) are the only ones to check
+  by hand: the `Decrypt` calls in whatever record of them you still have against the records
+  under `identity/granted/` for the same hours.
 
 ## Verify
 

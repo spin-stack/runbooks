@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: warning
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -34,7 +34,12 @@ send traffic somewhere it should not).
    spin workspace egress <workspace>
    ```
 
-   TODO: an administrator cannot read where a workspace they do not own sends ([spin#1045](https://github.com/spin-stack/spin/issues/1045))
+   An administrator reads it for a workspace that is not theirs. It changes nothing, and the
+   reading is audited with the reason; if the audit entry cannot be written, it answers nothing:
+
+   ```
+   spin admin workspace egress <workspace-id> --reason "<why>"
+   ```
 3. See what it has cost this month:
 
    ```

@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet, storage]
 severity: critical
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-12
 ---
 
 ## Symptoms
@@ -83,7 +83,16 @@ it writes from now on is lost with its host. Each failed restore reads the objec
 - **The host is the cause for many volumes**: stop it taking new work with
   `spin admin runner drain <runner-id>`, and look at it on a [host-shell](host-shell.md).
 
-TODO: an administrator cannot list which workspaces have a refused volume, or recover a workspace they do not own ([spin#1045](https://github.com/spin-stack/spin/issues/1045))
+- **Which workspaces it is**: list every refused volume, with the refusal, the host, the
+  workspace and its owner (the listing is audited):
+
+  ```
+  spin admin volume refused
+  ```
+
+  If the owner cannot recover one, recover it for them with
+  `spin admin workspace recover <workspace-id> --reason "<why>"`, as in
+  [workspace-held](workspace-held.md).
 
 ## Verify
 
