@@ -33,7 +33,8 @@ calls time out and fail ([api-errors](api-errors.md)).
    - *Statement latency by operation* and *Statements a second by operation*: is one kind of
      statement slow, or are there simply many more?
    - *The pool over time* and *Waiting for a connection*: how full, and how long callers wait. The
-     pool holds at most 10 connections in this release (*Pool maximum*).
+     pool holds at most `database.max_conns` connections (*Pool maximum*): 10 unless the control
+     plane's document says otherwise, and never more than 20.
 2. Find the slow callers in [Admin → Traces](/admin/traces): their spans carry each statement and
    how long it took.
 3. On the control plane's machine, check the database itself:
@@ -60,13 +61,16 @@ calls time out and fail ([api-errors](api-errors.md)).
   [database-restore](database-restore.md) before replacing it: the database moves by handover.
 - **Long-held connections** with few statements: restart the control plane, which closes its pool:
   `systemctl restart spin-controlplane.service`. Brief: the API is down while it starts.
-
-TODO: the pool's size (10) is fixed in the binary; there is no setting to change it ([spin#1053](https://github.com/spin-stack/spin/issues/1053))
+- **The pool is full with the machine idle** (callers waiting, CPU and I/O low): raise
+  `database.max_conns` (and `database.min_conns` if it starts cold) in the control plane's
+  document, which the installation's Terraform writes, then restart the control plane. Above 20
+  it refuses to start: the machine's PostgreSQL has 30 connections, and the rest are its one-shot
+  commands', its backup's and an operator's.
 
 ## Verify
 
 On [Admin → Metrics](/admin/metrics?dashboard=spin-db-performance), connections in use drop below
-8 of 10 and statement p99 below 0.5 s. Both alerts resolve.
+four fifths of the pool maximum and statement p99 below 0.5 s. Both alerts resolve.
 
 ## Escalate
 
