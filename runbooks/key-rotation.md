@@ -133,6 +133,17 @@ sudo spin-controlplane crypto verify
    or drop it from `SPIN_CP_ENCRYPTION_KEY` and restart. A version removed while anything is still
    sealed under it is that data lost.
 
+**The installation's identity key** (signs the tokens and certificates workspaces present outside
+Spinbox). Rotate it with three steps:
+
+1. Run `sudo spin-controlplane identity rotate` on the control plane's machine.
+2. Apply the `identity_keys` list it prints. Old and new keys overlap: both are published, and
+   new tokens are signed with the new one.
+3. Run `sudo spin-controlplane identity retire <old kid>` and apply the list it prints.
+
+Each step is in [identity-audit-failing](identity-audit-failing.md). It needs a key service: an
+installation that keeps its identity key itself, in its database, refuses the rotation.
+
 ## Verify
 
 [Admin → Audit](/admin/audit) shows each revoke. `spin admin volume rekeys` empties as the job

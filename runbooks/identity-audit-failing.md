@@ -57,10 +57,37 @@ and every grant is recorded in the bucket where it cannot be taken back.
   2. If a runner did it, revoke it (`spin admin runner revoke <runner-id>`); on an autoscaling
      group, `spin admin runner remove <runner-id>`. See
      [host-wrote-foreign-volume](host-wrote-foreign-volume.md) for what else a taken host held.
-  3. Tell the relying parties that trust this installation's identity tokens to stop trusting them
-     until the key is replaced.
+  3. Rotate the identity key, after step 1: the new key is sealed under the same key service key,
+     so whoever opened the old one could open the new one the same way.
+     1. On the control plane's machine:
 
-  TODO: the identity key cannot be rotated; it is made once and every relying party trusts its one public key ([spin#1050](https://github.com/spin-stack/spin/issues/1050))
+        ```
+        sudo spin-controlplane identity rotate
+        ```
+
+        It makes the next key and prints its kid and the `identity_keys` list to apply. Nothing
+        publishes, accepts or signs with that key until the list is applied. Run it again and it
+        prints the same key, without making another.
+     2. Set the Terraform module's `identity_keys` to that list and apply. The control plane and
+        the proxy are replaced onto it. From then on, `https://id.<your domain>` publishes both
+        keys, and every host signs new tokens and certificates with the new key once it
+        reconnects. Tokens the old key signed still verify.
+     3. On the new control plane's machine:
+
+        ```
+        sudo spin-controlplane identity retire <old kid>
+        ```
+
+        The old kid is the one the first step did not print, or the first `kid` in the issuer's
+        `/.well-known/jwks.json`. It prints the list with the old key retired an hour from now,
+        once everything it signed has ended. Apply that list. After that time the old key is gone
+        from the key set and the SPIFFE bundle, and the control plane refuses its tokens.
+        `allowed_signers` keeps it, valid before that time, so commits signed earlier still
+        verify. In a compromise, an earlier time ends the old key sooner; tokens it signed stop
+        verifying at once.
+  4. Tell the relying parties that trust this installation's identity tokens what happened, and
+     that the old kid is retired. A relying party that copied the key set or the SPIFFE bundle
+     instead of reading `https://id.<your domain>` must take the new one.
 - **The audit fails**: restore the control plane's permission to read the key service's log and
   the bucket, then run it again:
 
@@ -81,7 +108,10 @@ and every grant is recorded in the bucket where it cannot be taken back.
 ## Verify
 
 The next run on [Admin → Jobs](/admin/jobs?job=identity-audit) succeeds, with `openings` no more
-than `grants`, and the job alerts resolve.
+than `grants`, and the job alerts resolve. After a rotation,
+`https://id.<your domain>/.well-known/jwks.json` names the new kid. Once the old key's retired
+time has passed, it no longer names the old kid. The control plane's journal says
+`The installation's identity keys` with the new `signing_kid`.
 
 ## Escalate
 
