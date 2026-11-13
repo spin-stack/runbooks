@@ -10,11 +10,14 @@ tasks:
       - task: check
 
   check:
-    desc: What CI runs - fail if a runbook's front matter, sections or links are not what the app reads, it carries raw HTML or what a public repository must not, a workflow step is not one task, or an install skips Socket Firewall.
+    desc: What CI runs - fail if a runbook's front matter, sections or links are not what the app reads, it carries raw HTML or what a public repository must not, a workflow step is not one task, an install skips Socket Firewall, or a commit since origin/main is by a test's identity.
     cmds:
       # The Task running this one: go.mod's is not on PATH, and taskgate asks it for the task names.
       - go tool taskgate -task {{.TASK_EXE}}
       - go tool sfw check
+      # A test that writes git's author into the checkout makes every commit after it the
+      # test's; this refuses those commits before they reach main.
+      - go tool testidentity -base origin/main
       - go vet ./...
       - go test ./...
       - go run ./cmd/check
