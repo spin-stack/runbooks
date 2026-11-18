@@ -8,15 +8,17 @@ applies_to:
   dashboards: [overview, spin-api-performance, spin-db-performance]
 severity: critical
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-17
 ---
 
 ## Symptoms
 
-**High API Error Rate** fires when, over the last 5 minutes, more than 5% of the control plane's
-API calls ended with any status other than `OK`, and it stays so for 5 minutes. The rule divides
-`rpc_server_call_duration_seconds_count{rpc_response_status_code!="OK"}` by all calls; the
-description gives the share.
+**High API Error Rate** fires when, over the last 5 minutes, the control plane failed more than 5%
+of its API calls, and it stays so for 5 minutes. A failure is the server's: `INTERNAL`,
+`UNAVAILABLE`, `UNKNOWN`, `DATA_LOSS`, or `DEADLINE_EXCEEDED` on anything but `WaitWorkspace` and
+`WaitSnapshot`, whose deadline is the caller's. A caller told no - `NOT_FOUND` for a workspace just
+deleted, `UNAUTHENTICATED` on a signed-out page, `FAILED_PRECONDITION` - is not counted: it is the
+API answering. The description gives the share.
 
 People see pages that fail to load, `spin` commands that print an error, editors that cannot
 connect.
@@ -30,11 +32,13 @@ open one while the calls that do it fail.
 ## Diagnose
 
 1. Open [Admin → Metrics](/admin/metrics?dashboard=spin-api-performance) (API Performance).
-   *Failed requests by status* says what kind of failure; *Methods that fail most* says where.
-   - `UNAUTHENTICATED`, `PERMISSION_DENIED`: callers turned away. Many at once is a client with a
-     dead credential, or a brute force: see [auth-failures-looping](auth-failures-looping.md).
-   - `RESOURCE_EXHAUSTED`: the rate limit refusing: see [rate-limited](rate-limited.md).
-   - `INTERNAL`, `UNAVAILABLE`, `DEADLINE_EXCEEDED`: the control plane's own faults.
+   *Answers other than OK* says what kind; *Methods that fail most* says where the server fails.
+   - `INTERNAL`, `UNAVAILABLE`, `UNKNOWN`, `DATA_LOSS`, `DEADLINE_EXCEEDED`: the control plane's
+     own faults, and what this alert counts.
+   - `UNAUTHENTICATED`, `PERMISSION_DENIED`: callers turned away, not counted. Many at once is a
+     client with a dead credential, or a brute force: see
+     [auth-failures-looping](auth-failures-looping.md).
+   - `RESOURCE_EXHAUSTED`: the rate limit refusing, not counted: see [rate-limited](rate-limited.md).
 2. Take a failing method to [Admin → Traces](/admin/traces): each failed call is kept whole, with
    the database statements and calls to runners under it.
 3. Read what the control plane logged:
@@ -60,10 +64,6 @@ open one while the calls that do it fail.
   [control-plane-resources](control-plane-resources.md).
 - **Runners not answering** (errors on start, stop, connect): follow
   [host-not-reporting](host-not-reporting.md).
-- **One client failing in a loop** (one method, `UNAUTHENTICATED`): it is not the installation;
-  find and stop the client ([auth-failures-looping](auth-failures-looping.md)).
-- **A release just went out**: a CLI or runner of another release is refused by the control
-  plane. `spin admin versions` shows what runs where; people update their CLI with `spin update`.
 
 ## Verify
 
