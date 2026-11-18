@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: critical
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-18
 ---
 
 ## Symptoms
@@ -50,19 +50,16 @@ and its volumes' ages are what it last said.
 
 4. Look at the machine itself in the cloud's console: running, stopped, terminated, failing its
    status checks. On AWS, an autoscaling group may have replaced it.
-5. If the machine runs, on it:
 
-   ```
-   systemctl status spin-runner.service
-   journalctl -u spin-runner.service --since "1 hour ago"
-   ```
-
-   Runners have no SSH; on AWS they are reached through Session Manager.
+Nothing here is done on the machine. A runner has no SSH and no Session Manager, and the one way
+onto it, a [host-shell](host-shell.md), rides the host's own connection to the control plane: a
+host that is not connected cannot open one.
 
 ## Fix
 
-- **The runner process stopped**: `systemctl restart spin-runner.service` on the machine. A runner
-  that restarts comes back as the same host and its workspaces are waited for, nothing lost.
+- **The machine runs and the runner does not answer**: reboot the instance from the cloud's
+  console (on AWS, *Reboot instance*), not from inside it. The runner starts with the machine and
+  comes back as the same host; its workspaces are waited for, nothing lost.
 - **The network between them** (the machine runs, the runner logs it cannot reach the control
   plane): fix the route, the security group or the DNS name. The host reconnects on its own.
 - **The runner was revoked** (its log says its token is invalid): it will never connect again.
@@ -71,6 +68,16 @@ and its volumes' ages are what it last said.
   another host either by their owners (`spin workspace recover <workspace>`) or by the control
   plane on its own, past the installation's rehome threshold
   ([workspace-rehomed](workspace-rehomed.md)).
+- **It comes back but keeps failing**: empty it and replace it. Its workspaces resume on other
+  runners, and its machine, with everything on its disks, is terminated:
+
+  ```
+  spin admin runner drain <runner-id> --suspend
+  spin admin runner remove <runner-id>
+  ```
+
+  To see why first, open a [host-shell](host-shell.md) instead: it empties the runner the same
+  way and retires it when the shell ends.
 - **Cannot tell yet**: stop placing on it until you know: `spin admin runner drain <runner-id>`.
 
 ## Verify

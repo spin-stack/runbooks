@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet, storage]
 severity: critical
 owner: operator
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-18
 ---
 
 ## Symptoms
@@ -81,7 +81,9 @@ it writes from now on is lost with its host. Each failed restore reads the objec
   A refused volume counts as stopped, so recover does not wait for the host. The workspace
   restarts from the last commit the store has; see [workspace-rehomed](workspace-rehomed.md).
 - **The host is the cause for many volumes**: stop it taking new work with
-  `spin admin runner drain <runner-id>`, and look at it on a [host-shell](host-shell.md).
+  `spin admin runner drain <runner-id>`. To see why, open a [host-shell](host-shell.md): it
+  empties the runner first and retires it when the shell ends, so the host is replaced either
+  way. To replace it without looking, `drain --suspend` and then `spin admin runner remove`.
 
 - **Which workspaces it is**: list every refused volume, with the refusal, the host, the
   workspace and its owner (the listing is audited):
