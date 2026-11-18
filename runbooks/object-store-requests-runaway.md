@@ -8,7 +8,7 @@ applies_to:
   dashboards: [storage]
 severity: warning
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-18
 ---
 
 ## Symptoms
@@ -49,9 +49,10 @@ hour, and is usually a symptom of a volume the host cannot serve.
 - **The store refusing** (access denied, throttling): the host's credentials or the bucket's
   policy changed. Check the host's role in the cloud and *Credentials hosts asked for, and what the
   store's STS minted* on the storage dashboard.
-- **Nothing explains it**: stop the host taking new work (`spin admin runner drain <runner-id>`)
-  and look at it on a [host-shell](host-shell.md). Draining with `--suspend` moves its running
-  workspaces elsewhere.
+- **Nothing explains it**: stop the host taking new work (`spin admin runner drain <runner-id>`).
+  To see why, open a [host-shell](host-shell.md): it empties the runner first and retires it
+  when the shell ends. To replace it without looking, `drain --suspend` and then
+  `spin admin runner remove`.
 
 ## Verify
 

@@ -8,7 +8,7 @@ applies_to:
   dashboards: []
 severity: info
 owner: security
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-18
 ---
 
 ## Symptoms
@@ -27,7 +27,11 @@ A root shell is for a while, with a reason, and costs the runner:
   under Object Lock.
 - Once the shell ends (its minutes are up, or it is closed) the runner is **retired**: revoked,
   every disk it held the key of marked to be re-keyed, and its machine given back to its group,
-  which replaces it. A runner someone had root on runs no workspace again.
+  which terminates it and is asked for one less; the autoscaler starts another when the fleet
+  needs the room. A runner someone had root on runs no workspace again.
+
+A shell is for seeing why. To replace a runner without looking at it, no shell is needed:
+`spin admin runner drain <runner-id> --suspend`, then `spin admin runner remove <runner-id>`.
 
 ## Diagnose
 
@@ -89,7 +93,7 @@ Settings, the CLI or the configuration file; only the admin API takes them ([spi
 ## Verify
 
 `spin admin shell list` shows the shell `ended`, with RETIRED `true`. The runner is gone from
-[Admin → Runners](/admin/runners) or revoked, and its group has started a replacement.
+[Admin → Runners](/admin/runners) or revoked, and its group no longer lists its machine.
 `spin admin volume rekeys` lists the disks it held while they are re-keyed
 ([key-rotation](key-rotation.md)). [Admin → Audit](/admin/audit) has `host_shell_requested`,
 `host_shell_approved`, `host_shell_session_opened` and `host_shell_session_ended`.

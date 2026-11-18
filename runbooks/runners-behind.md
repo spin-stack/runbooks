@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: warning
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-18
 ---
 
 ## Symptoms
@@ -46,15 +46,18 @@ or stopped through it. The fleet has that much less room.
 ## Fix
 
 - **An autoscaling group's runner**: make sure the group now starts machines of the control
-  plane's release (its launch template names the new image), then give the old one back to its
-  group, which drains it, terminates it and starts a new one:
+  plane's release (its launch template names the new image), then empty the old one and give it
+  back. Its group terminates it and is asked for one machine less; the autoscaler asks for a new
+  one, of the new image, when the fleet needs the room:
 
   ```
+  spin admin runner drain <runner-id> --suspend
   spin admin runner remove <runner-id>
   ```
 
-  A runner that is the only home of a workspace's disk is refused, naming them; their owners stop
-  or move them first.
+  `remove` refuses a runner that is still the only home of a workspace's disk, naming them: run
+  the drain again ([workspace-suspends-failing](workspace-suspends-failing.md)), or their owners
+  stop them.
 - **A runner registered with a token** (self-hosted): drain it with `--suspend` so its workspaces
   move, install the control plane's release on the machine, and join it again with a new token
   (`spin admin token create`). See [lost-runner](lost-runner.md) for taking the old host out.
