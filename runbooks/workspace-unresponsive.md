@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: warning
 owner: operator
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-22
 ---
 
 ## Symptoms
@@ -57,7 +57,7 @@ may reach out while nothing reports what it does.
 ## Fix
 
 - **The guest ran out of memory**: the owner starts it again and gives it more
-  (`spin workspace grant <workspace> --memory <MB>`), or uses a larger preset.
+  (`spin workspace grant <workspace> --memory <MB>`), or uses a larger size.
 - **It keeps happening to one workspace with nothing in its console**: compare
   `spin workspace status <workspace>`, which shows what the supervisor last said, and escalate.
 - **The job fails**: it fails when it cannot reach the database; see

@@ -22,7 +22,7 @@ proposal that waits for an administrator.
 
 Nothing changes until it is answered, so the installation keeps running what it had, which is not
 what the file's author meant. A release's new default, an address added to a trusted proxy range or
-a preset resized stays unapplied: workspaces keep the old size, a proxy keeps refusing the new
+a size resized stays unapplied: workspaces keep the old floor and ceiling, a proxy keeps refusing the new
 range.
 
 ## Diagnose

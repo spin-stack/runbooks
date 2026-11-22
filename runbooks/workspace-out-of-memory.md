@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: info
 owner: operator
-last_reviewed: 2026-11-12
+last_reviewed: 2026-11-22
 ---
 
 ## Symptoms
@@ -50,7 +50,7 @@ Nothing is resized on its own: the event is the owner's to act on.
 ## Fix
 
 - **One workspace that needs more**: its owner runs the command in the notice, or picks a larger
-  preset where the notice says it is granted all its preset allows.
+  size where the notice says it is granted all its size allows.
 - **A runner killing machines**: follow [host-not-reporting](host-not-reporting.md) for the runner,
   and see what it holds on [Admin → Runners](/admin/runners).
 
