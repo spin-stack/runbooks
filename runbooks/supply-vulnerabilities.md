@@ -8,7 +8,7 @@ applies_to:
   dashboards: [fleet]
 severity: warning
 owner: security
-last_reviewed: 2026-11-09
+last_reviewed: 2026-11-23
 ---
 
 ## Symptoms
@@ -31,13 +31,10 @@ part. While the job fails, a new vulnerability goes unreported.
 
 ## Diagnose
 
-1. See which ones. The control plane logs each finding, with the vulnerability's id and the
-   package:
-
-   ```
-   spin admin logs 'service_name:spin-controlplane AND body.message:supplyvuln' --since 48h
-   ```
-
+1. See which ones on [Admin → Vulnerabilities](/admin/vulnerabilities). It lists what the last
+   scan found: each vulnerability with its package and version, the versions that fix it, and the
+   SBOMs that name the package. Under it are the ones the release ignores, each with why. Those
+   are not counted, and the alert does not fire for them.
 2. The job's page on [Admin → Jobs](/admin/jobs?job=supply-vulnerabilities) shows what its last run
    counted: SBOMs, components and vulnerabilities. So does *What each job's last successful run
    found* on [Admin → Metrics](/admin/metrics?dashboard=fleet).
