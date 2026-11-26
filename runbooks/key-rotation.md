@@ -58,7 +58,7 @@ spin admin volume rekey <workspace-id>
 ```
 
 It takes the workspace's id, not its name, and works for anybody's workspace. The id is in
-`spin admin volume rekeys --json` (`workspace_id`) for a marked disk, or on the workspace's page.
+`spin admin volume rekeys -o json` (`workspaceId`) for a marked disk, or on the workspace's page.
 
 **Runner registration tokens**: `spin admin token revoke <token-id>`. A pool's token is
 re-minted on the control plane's machine with `sudo spin-controlplane registration-token ...`.
