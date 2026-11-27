@@ -26,8 +26,8 @@ github.com/rogpeppe/go-internal v1.15.0 h1:D0RCU5rMAp+SpgkiNdrjfJ+LX4J1M32V2NeCY
 github.com/rogpeppe/go-internal v1.15.0/go.mod h1:DrUVZyrJU+txYW5/1kwtXQSMFio52ZOxX7yM1VHvnxs=
 github.com/sirupsen/logrus v1.9.4 h1:TsZE7l11zFCLZnZ+teH4Umoq5BhEIfIzfRDZ1Uzql2w=
 github.com/sirupsen/logrus v1.9.4/go.mod h1:ftWc9WdOfJ0a92nsE2jF5u5ZwH8Bv2zdeOC42RjbV2g=
-github.com/spin-stack/go-tools v0.20261127.3 h1:EjDn4Iuqm6UGWtXMDU6/biz1qhsPPeCga39ShMtwalA=
-github.com/spin-stack/go-tools v0.20261127.3/go.mod h1:53OPE4ZN80sLk833EXfF/Nwp/PAgYsBskK6PKBTZtKs=
+github.com/spin-stack/go-tools v0.20261127.15 h1:G+Ps5zOyJKQA9K0iN+ML1MHPfIAYtO+vIhLfT48skVc=
+github.com/spin-stack/go-tools v0.20261127.15/go.mod h1:53OPE4ZN80sLk833EXfF/Nwp/PAgYsBskK6PKBTZtKs=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/yuin/goldmark v1.8.6 h1:d0VcaP1sx9GkFVkoW+KtggpGi2KZ965i14b0+bDQST4=
