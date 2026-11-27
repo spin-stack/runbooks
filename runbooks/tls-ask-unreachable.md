@@ -18,7 +18,7 @@ plane whether a name may have a certificate, in the last 10 minutes
 (`tls_ask_total{answer="control_plane_unreachable"}`).
 
 The proxy asks before it gets a certificate for a workspace's name it has none for. When it cannot
-ask, it hands out none: people opening a new workspace, or a newly exposed port, get a TLS error in
+ask, it hands out none: people opening a new workspace, or a newly published port, get a TLS error in
 the browser.
 
 ## Impact

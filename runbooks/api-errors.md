@@ -17,7 +17,7 @@ last_reviewed: 2026-11-17
 of its API calls, and it stays so for 5 minutes. A failure is the server's: `INTERNAL`,
 `UNAVAILABLE`, `UNKNOWN`, `DATA_LOSS`, or `DEADLINE_EXCEEDED` on anything but `WaitWorkspace` and
 `WaitSnapshot`, whose deadline is the caller's. A caller told no - `NOT_FOUND` for a workspace just
-deleted, `UNAUTHENTICATED` on a signed-out page, `FAILED_PRECONDITION` - is not counted: it is the
+deleted, `UNAUTHENTICATED` on a page nobody is logged in to, `FAILED_PRECONDITION` - is not counted: it is the
 API answering. The description gives the share.
 
 People see pages that fail to load, `spin` commands that print an error, editors that cannot

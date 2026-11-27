@@ -35,7 +35,7 @@ of memory, the control plane is killed and every API call fails until it is back
      holds what the load needs.
    - A line that climbs steadily without load to match is a leak.
 2. Compare with what it serves: hosts connected (`spin admin runner list`), workspaces running and
-   people signed in. Each connected runner and each open terminal or editor holds goroutines.
+   people logged in. Each connected runner and each open terminal or editor holds goroutines.
 3. Read what the control plane logged around when the climb started:
 
    ```

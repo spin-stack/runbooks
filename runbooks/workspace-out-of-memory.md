@@ -20,7 +20,7 @@ one of:
 
 > Workspace `<workspace>` is out of memory at its ceiling
 
-> Workspace `<workspace>` ran out of memory and its host stopped it
+> Workspace `<workspace>` ran out of memory and its runner stopped it
 
 with what it held, its own memory and how far it may be lent, and the command
 `spin workspace grant <workspace> --memory <MB>`. `spin workspace history <workspace>` has the
@@ -31,9 +31,9 @@ the three causes at most every ten minutes, however often it runs out in between
 
 - **Its kernel killed processes** (cause `guest`): a build, a language server or an editor's
   server ended. The workspace runs on; what was killed is gone until it is started again.
-- **Short at its ceiling** (cause `ceiling`): its host has lent it all it may have for a minute
+- **Short at its ceiling** (cause `ceiling`): its runner has lent it all it may have for a minute
   and it is still short. A kill is likely next.
-- **Its host killed the machine** (cause `host`): the whole workspace stopped, as after a power
+- **Its runner killed the machine** (cause `host`): the whole workspace stopped, as after a power
   cut. Its disk is kept.
 
 Nothing is resized on its own: the event is the owner's to act on.
@@ -42,10 +42,10 @@ Nothing is resized on its own: the event is the owner's to act on.
 
 1. Which cause? `spin workspace history <workspace>` shows it, with what was killed.
 2. What did it use? The workspace's page in the dashboard shows its last hour of memory against
-   what it held, while its host still has the hour.
-3. Many workspaces on one runner killed by their host at once is the runner's memory, not the
+   what it held, while its runner still has the hour.
+3. Many workspaces on one runner killed by their runner at once is the runner's memory, not the
    workspaces': *Containment and DNS* on [Admin → Metrics](/admin/metrics?dashboard=fleet) counts
-   the host's kills.
+   the runner's kills.
 
 ## Fix
 

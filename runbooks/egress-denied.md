@@ -84,8 +84,8 @@ An administrator also checks:
 
 - **It runs under `offline`** because it was created with no tag and the installation has no
   `default_network_tags`: retag it, and set the default on Admin → Network.
-- **A brokered request fails**: the team's secret is missing or not allowed for that host
-  (`spin team secret list <team>`; `spin team secret set` names the hosts it may be sent to).
+- **A brokered request fails**: the team's secret is missing or not allowed for that hostname
+  (`spin team secret list <team>`; `spin team secret set` names the hostnames it may be sent to).
 - **It was held after a denial**: follow [quarantine-workspace](quarantine-workspace.md).
 - **It reaches far more than expected**: see [workspace-egress-high](workspace-egress-high.md).
 

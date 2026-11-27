@@ -17,10 +17,10 @@ last_reviewed: 2026-11-22
 requests for the rate limit in 10 minutes, for one kind of limit
 (`rate_limit_rejected_total`, by `limit_type`):
 
-- `auth`: the sign-in calls, which have their own lower limit and are counted per address, whoever
+- `auth`: the login calls, which have their own lower limit and are counted per address, whoever
   makes them.
-- `api`: every other call. A signed-in person has a budget of their own, shared by all their
-  sessions and API keys. A request nobody is signed in to (none, a credential refused, a host's or
+- `api`: every other call. A person who is logged in has a budget of their own, shared by all their
+  sessions and API keys. A request nobody is logged in for (none, a credential refused, a runner's or
   the proxy's) is counted against its address.
 
 The client refused gets `RESOURCE_EXHAUSTED`: "Rate limit exceeded. Please wait before retrying."
@@ -28,7 +28,7 @@ The client refused gets `RESOURCE_EXHAUSTED`: "Rate limit exceeded. Please wait 
 ## Impact
 
 Either the limit is too low for how the installation is used (one person's agents and keys that
-call the API in bursts together, or one address that many unsigned-in callers share), and real
+call the API in bursts together, or one address that many callers who are not logged in share), and real
 people are refused; or someone is guessing credentials or
 hammering the API, and the limit is doing its job. Both want a look.
 
@@ -38,7 +38,7 @@ hammering the API, and the limit is doing its job. Both want a look.
    [Admin → Metrics](/admin/metrics?dashboard=fleet): which limit, and whether credentials are
    refused at the same time (a brute force: [auth-failures-looping](auth-failures-looping.md)).
 2. Find who: the control plane logs each refusal with the client's address, the method and, when
-   the caller was signed in, their `user_id`.
+   the caller was logged in, their `user_id`.
 
    ```
    spin admin logs 'service_name:spin-controlplane AND body.message:"Rate limit exceeded"' --since 1h
@@ -56,13 +56,13 @@ hammering the API, and the limit is doing its job. Both want a look.
 - **A tool looping**: fix the tool. Its owner can see it in their own use; an API key it holds can
   be revoked by its owner (`spin api-key revoke <key-id>`). Every session and key of one person
   spends the same budget, so a tool that loops refuses that person's other work too.
-- **Unsigned-in refusals all show one address** (the proxy's, or a load balancer's): the control
+- **Refusals of callers who are not logged in all show one address** (the proxy's, or a load balancer's): the control
   plane is not seeing the caller's real address, and they share one budget. It takes
   `X-Forwarded-For` only from a trusted proxy (loopback always, and whatever
   [Admin → Security](/admin/security) lists as *Trusted proxies*); add what sits in front of it.
-  Signed-in people are not affected: their budget is their own, whatever address they come from.
+  People who are logged in are not affected: their budget is their own, whatever address they come from.
 - **Guessing or abuse from an unknown address**: leave the limit as it is; block the address at
-  the network edge (security group, firewall). Treat a sign-in brute force as a security event
+  the network edge (security group, firewall). Treat a login brute force as a security event
   ([auth-failures-looping](auth-failures-looping.md)).
 
 ## Verify

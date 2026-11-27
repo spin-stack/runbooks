@@ -1,6 +1,6 @@
 ---
 id: admin-lockout
-title: No administrator can sign in
+title: No administrator can log in
 applies_to:
   alerts: []
   jobs: []
@@ -13,12 +13,12 @@ last_reviewed: 2026-11-09
 
 ## Symptoms
 
-Nobody can reach the Admin pages: every administrator is disabled, demoted, deleted, or signs in
+Nobody can reach the Admin pages: every administrator is disabled, demoted, deleted, or logs in
 through an identity provider that is disabled or gone. Or the one administrator left lost every
 passkey and no other can clear them.
 
 The control plane refuses any change that would cause this: the database keeps an administrator
-who can sign in (an instance admin, not disabled, with a password or whose last sign-in was
+who can log in (an instance admin, not disabled, with a password or whose last login was
 through an enabled installation identity provider), and the dashboard greys out such actions on
 [Admin → Users](/admin/users) and [Admin → Security](/admin/security) with the reason. A lockout
 still happens from outside the API: a database restored from before, or an edit nobody reviewed.
@@ -35,7 +35,7 @@ way back is on the control plane's machine.
    them on [Admin → Users](/admin/users) (*Clear passkeys*); they register a new one on their next
    session. Stop here if that works.
 2. If the installation's first administrator never chose their own password, that account still
-   signs in. On the control plane's machine:
+   logs in. On the control plane's machine:
 
    ```
    sudo spin-controlplane bootstrap-password --user
@@ -49,7 +49,7 @@ way back is on the control plane's machine.
    sudo /usr/libexec/postgresql18/psql -h /run/spin-postgres -U spin spin
    ```
 
-   Who is an administrator, and how they sign in:
+   Who is an administrator, and how they log in:
 
    ```
    SELECT id, email, disabled, identity_provider_id, last_login_at
@@ -69,7 +69,7 @@ dashboard:
   UPDATE identity_providers SET enabled = true WHERE id = '<provider-id>';
   ```
 
-- **Make an administrator of somebody who signs in through an enabled provider**:
+- **Make an administrator of somebody who logs in through an enabled provider**:
 
   ```
   UPDATE users SET is_instance_admin = true WHERE email = '<email>';
@@ -93,7 +93,7 @@ whoever owns security for the installation.
 
 ## Verify
 
-The person signs in and opens [Admin → Users](/admin/users). The database's own rule holds again:
+The person logs in and opens [Admin → Users](/admin/users). The database's own rule holds again:
 
 ```
 SELECT installation_has_an_admin_way_in(NULL, NULL);

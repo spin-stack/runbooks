@@ -66,9 +66,9 @@ re-minted on the control plane's machine with `sudo spin-controlplane registrati
 **API keys**: the owner runs `spin api-key revoke <key-id>`; an administrator revokes anyone's
 on [Admin → Users](/admin/users). Keys a key delegated go with it.
 
-**Sessions and people**: disable the person's sign-in on [Admin → Users](/admin/users); they run
+**Sessions and people**: disable the person's login on [Admin → Users](/admin/users); they run
 `spin logout` on a machine they still hold. A person who lost their passkeys: *Clear passkeys* on
-the same page ([admin-lockout](admin-lockout.md) if no administrator can sign in).
+the same page ([admin-lockout](admin-lockout.md) if no administrator can log in).
 
 **SSH keys**: the owner runs `spin ssh-key delete <key-id>`; a guest is taken out with
 `spin workspace guests remove <workspace> <email>`.
@@ -89,7 +89,7 @@ GitHub and people connect again (`spin git connect`). A person gives up their ow
 **Team secrets**: replace the value at its source, then set it again from standard input:
 
 ```
-spin team secret set <team> <name> --host <host>
+spin team secret set <team> <name> --hostname <hostname>
 ```
 
 **The installation's encryption key** (seals secrets in the database, and the database's password
