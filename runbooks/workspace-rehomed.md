@@ -1,6 +1,6 @@
 ---
 id: workspace-rehomed
-title: A workspace was moved off a host that stopped answering
+title: A workspace was moved off a runner that stopped answering
 applies_to:
   alerts: []
   jobs: []
@@ -16,34 +16,34 @@ last_reviewed: 2026-11-09
 The owner sees on [Settings → Notifications](/settings/notifications) (email is off by default
 for this one):
 
-> Workspace `<workspace>` was moved off a host that stopped answering
+> Workspace `<workspace>` was moved off a runner that stopped answering
 
-with how much work its host had not published, and `spin workspace start <workspace>`.
+with how much work its runner had not published, and `spin workspace start <workspace>`.
 
 ## Impact
 
-The host stopped answering for longer than `rehome_after_seconds`, and what it had not
+The runner stopped answering for longer than `rehome_after_seconds`, and what it had not
 published was at or under `rehome_max_unpublished_bytes`, so the control plane moved the
-workspace to another host on its own, as the installation's settings allow. The owner lost the
-writes that host had not published (the amount is in the notice). The workspace is stopped on
-its new host until they start it.
+workspace to another runner on its own, as the installation's settings allow. The owner lost the
+writes that runner had not published (the amount is in the notice). The workspace is stopped on
+its new runner until they start it.
 
-Many such notices at once mean a host, or several, went away.
+Many such notices at once mean a runner, or several, went away.
 
 ## Diagnose
 
-1. Which host went silent? [Admin → Audit](/admin/audit) has a `workspace_recovered` entry per
+1. Which runner went silent? [Admin → Audit](/admin/audit) has a `workspace_recovered` entry per
    move, with the bytes given up; *Per host: heartbeat age* on
    [Admin → Metrics](/admin/metrics?dashboard=fleet) shows which runner went quiet.
 2. Why? Follow [host-not-reporting](host-not-reporting.md).
 3. Was the loss larger than expected? *What losing a host would cost* on
-   [Admin → Metrics](/admin/metrics?dashboard=storage) shows how far behind each host's
-   publishing was. A host that publishes far behind its RPO loses more when it goes.
+   [Admin → Metrics](/admin/metrics?dashboard=storage) shows how far behind each runner's
+   publishing was. A runner that publishes far behind its RPO loses more when it goes.
 
 ## Fix
 
 - The owner starts the workspace: `spin workspace start <workspace>`.
-- Deal with the host that went: bring it back, or retire it ([lost-runner](lost-runner.md)).
+- Deal with the runner that went: bring it back, or retire it ([lost-runner](lost-runner.md)).
 - If the loss is more than the installation is willing to give up without asking, lower
   `rehome_max_unpublished_bytes` (or unset `rehome_after_seconds` to move nothing on its own)
   in the installation's configuration file and apply the change on
@@ -52,11 +52,11 @@ Many such notices at once mean a host, or several, went away.
 
 ## Verify
 
-The workspace runs on its new host. The silent host is back, or gone from
+The workspace runs on its new runner. The silent runner is back, or gone from
 [Admin → Runners](/admin/runners).
 
 ## Escalate
 
-If workspaces are moved while their host is connected and heartbeating, stop: that is a defect.
+If workspaces are moved while their runner is connected and heartbeating, stop: that is a defect.
 Open an issue at https://github.com/spin-stack/spin/issues with the audit entries, the runner's
 id and heartbeat age at the time, and `spin admin versions`.

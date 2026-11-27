@@ -50,9 +50,9 @@ below says what. Nothing breaks at once, but it piles up.
 
 ### The jobs
 
-- **`sessions`**: deletes expired sign-in sessions. While it fails they stay in the database; an
-  expired one signs nobody in. Check the database.
-- **`expired-data`**: deletes expired API keys, sign-in, device and registration codes, forge
+- **`sessions`**: deletes expired login sessions. While it fails they stay in the database; an
+  expired one logs nobody in. Check the database.
+- **`expired-data`**: deletes expired API keys, login, device and registration codes, forge
   states, and audit entries past their retention. While it fails they pile up; an expired one
   admits nobody. Check the database.
 - **`workspace-trash`**: erases workspaces whose days in the trash are over, with their disks, and
